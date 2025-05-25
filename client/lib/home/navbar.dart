@@ -19,7 +19,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
               child: Icon(Icons.account_circle_sharp, color: Color(0xFF3C3F63), size: 45),
             ),
             onPressed: () {
-              
+              Navigator.pushNamed(context, '/login');
             },
           ),
         ],
