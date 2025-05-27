@@ -5,22 +5,22 @@ class MovieSuggestionRow extends StatelessWidget {
   final List<Map<String, String>> suggestions = [
     {
       'title': 'Prisoners',
-      'image': 'https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/vczkkhotp96ketweyc9a.jpg',
+      'image': 'https://res.cloudinary.com/djm6yhqvx/image/upload/v1742478610/qspf0rk9sa4ge0ykbaoc.jpg',
       'rating': '8.1'
     },
     {
       'title': 'Zodiac',
-      'image': 'https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/vczkkhotp96ketweyc9a.jpg',
+      'image': 'https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/qspf0rk9sa4ge0ykbaoc.jpg',
       'rating': '7.7'
     },
     {
       'title': 'Se7en',
-      'image': 'https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/vczkkhotp96ketweyc9a.jpg',
+      'image': 'https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/qspf0rk9sa4ge0ykbaoc.jpg',
       'rating': '8.6'
     },
     {
       'title': 'Shutter Island',
-      'image': 'https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/vczkkhotp96ketweyc9a.jpg',
+      'image': 'https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/qspf0rk9sa4ge0ykbaoc.jpg',
       'rating': '8.3'
     },
   ];
@@ -37,7 +37,7 @@ class MovieSuggestionRow extends StatelessWidget {
             style: TextStyle(
               fontSize: 20.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Colors.white,
             ),
           ),
         ),
@@ -91,7 +91,7 @@ class MovieSuggestionRow extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 17.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black
+                          color: Colors.white
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

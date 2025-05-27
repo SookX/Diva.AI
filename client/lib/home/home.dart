@@ -11,6 +11,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF030016),
       appBar: Navbar(),
       body: Column(
         
@@ -30,7 +31,7 @@ class HomePage extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 5.w),
             child: MovieCard(
-              imageUrl: 'https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/vczkkhotp96ketweyc9a.jpg',
+              imageUrl: 'https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/qspf0rk9sa4ge0ykbaoc.jpg',
               name: "Inception",
               yearLengthRating: "2010 - 2h 28m - 8.8",
               types: ["Action", "Sci-Fi", "Thriller"],
