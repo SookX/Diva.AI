@@ -32,6 +32,9 @@ class _RegisterViewState extends State<RegisterView> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('Registration successful: ${response.body}');
         _showNotification("Registration successful", true);
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pushNamed(context, '/login');
+        });
       } else {
         print('Registration failed: ${response.statusCode} ${response.body}');
         _showNotification("Registration failed. Please check your credentials.", false);

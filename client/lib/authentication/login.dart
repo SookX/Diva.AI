@@ -41,6 +41,10 @@ class _LoginPageState extends State<LoginPage> {
         print('Login successful!');
         print(response.body);
         _showNotification("Login successful!", true);
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pushNamed(context, '/');
+        });
+
 
       } else {
         print('Login failed: ${response.statusCode} ${response.body}');
