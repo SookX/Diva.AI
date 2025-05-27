@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/gestures.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -39,12 +40,15 @@ class _LoginPageState extends State<LoginPage> {
 
         print('Login successful!');
         print(response.body);
+        _showNotification("Login successful!", true);
 
       } else {
         print('Login failed: ${response.statusCode} ${response.body}');
+        _showNotification("Login failed. Please check your credentials.", false);
       }
     } catch (e) {
       print('Error occurred: $e');
+      _showNotification("An error occurred. Try again.", false);
     }
   }
 
@@ -252,4 +256,27 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+  void _showNotification(String message, bool success) {
+  Flushbar(
+    message: message,
+    icon: Icon(
+      success ? Icons.check_circle : Icons.error,
+      size: 28.0,
+      color: success ? Colors.green : Colors.red,
+    ),
+    duration: Duration(seconds: 2),
+    leftBarIndicatorColor: success ? Colors.green : Colors.red,
+    margin: EdgeInsets.all(12),
+    borderRadius: BorderRadius.circular(8),
+    backgroundGradient: LinearGradient(
+      colors: success
+          ? [Colors.green.shade700, Colors.greenAccent]
+          : [Colors.red.shade700, Colors.redAccent],
+    ),
+    flushbarPosition: FlushbarPosition.TOP,
+    animationDuration: Duration(milliseconds: 500),
+  ).show(context);
+}
+
 }
