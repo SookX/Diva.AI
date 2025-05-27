@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       print('Error occurred: $e');
-      _showNotification("An error occurred. Try again.", false);
+      _showNotification("$e", false);
     }
   }
 

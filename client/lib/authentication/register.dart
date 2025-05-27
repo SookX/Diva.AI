@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:another_flushbar/flushbar.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -30,11 +31,14 @@ class _RegisterViewState extends State<RegisterView> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('Registration successful: ${response.body}');
+        _showNotification("Registration successful", true);
       } else {
         print('Registration failed: ${response.statusCode} ${response.body}');
+        _showNotification("Registration failed. Please check your credentials.", false);
       }
     } catch (e) {
       print('Error occurred: $e');
+      _showNotification("$e", false);
     }
   }
 
@@ -233,5 +237,27 @@ class _RegisterViewState extends State<RegisterView> {
         ),
       ),
     );
+  }
+
+  void _showNotification(String message, bool success) {
+    Flushbar(
+      message: message,
+      icon: Icon(
+        success ? Icons.check_circle : Icons.error,
+        size: 28.0,
+        color: success ? Colors.green : Colors.red,
+      ),
+      duration: Duration(seconds: 2),
+      leftBarIndicatorColor: success ? Colors.green : Colors.red,
+      margin: EdgeInsets.all(12),
+      borderRadius: BorderRadius.circular(8),
+      backgroundGradient: LinearGradient(
+        colors: success
+            ? [Colors.green.shade700, Colors.greenAccent]
+            : [Colors.red.shade700, Colors.redAccent],
+      ),
+      flushbarPosition: FlushbarPosition.TOP,
+      animationDuration: Duration(milliseconds: 500),
+    ).show(context);
   }
 }
