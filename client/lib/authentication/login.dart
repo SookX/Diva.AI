@@ -258,25 +258,25 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _showNotification(String message, bool success) {
-  Flushbar(
-    message: message,
-    icon: Icon(
-      success ? Icons.check_circle : Icons.error,
-      size: 28.0,
-      color: success ? Colors.green : Colors.red,
-    ),
-    duration: Duration(seconds: 2),
-    leftBarIndicatorColor: success ? Colors.green : Colors.red,
-    margin: EdgeInsets.all(12),
-    borderRadius: BorderRadius.circular(8),
-    backgroundGradient: LinearGradient(
-      colors: success
-          ? [Colors.green.shade700, Colors.greenAccent]
-          : [Colors.red.shade700, Colors.redAccent],
-    ),
-    flushbarPosition: FlushbarPosition.TOP,
-    animationDuration: Duration(milliseconds: 500),
-  ).show(context);
-}
+    Flushbar(
+      message: message,
+      icon: Icon(
+        success ? Icons.check_circle : Icons.error,
+        size: 28.0,
+        color: success ? Colors.green : Colors.red,
+      ),
+      duration: Duration(seconds: 2),
+      leftBarIndicatorColor: success ? Colors.green : Colors.red,
+      margin: EdgeInsets.all(12),
+      borderRadius: BorderRadius.circular(8),
+      backgroundGradient: LinearGradient(
+        colors: success
+            ? [Colors.green.shade700, Colors.greenAccent]
+            : [Colors.red.shade700, Colors.redAccent],
+      ),
+      flushbarPosition: FlushbarPosition.TOP,
+      animationDuration: Duration(milliseconds: 500),
+    ).show(context);
+  }
 
 }
