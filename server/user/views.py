@@ -278,13 +278,24 @@ GOOGLE_OAUTH2 = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
 @api_view(['POST'])
 def google_login(request):
     token = request.data.get('token')
-    
-    idinfo = id_token.verify_oauth2_token(token, requests.Request(), GOOGLE_OAUTH2)
-    print(idinfo)
-    user, created = CustomUser.objects.get_or_create(email=idinfo['email'], username = idinfo['name'])
-    user.is_active = True
-    user.save()
+
+    try:
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), GOOGLE_OAUTH2)
+    except ValueError:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+    email = idinfo.get('email')
+    username = idinfo.get('name') or email.split('@')[0]
+
+    try:
+        user = CustomUser.objects.get(email=email)
+    except CustomUser.DoesNotExist:
+        user = CustomUser(email=email, username=username, is_active=True)
+        user.set_unusable_password() 
+        user.save()
+
     refresh = RefreshToken.for_user(user)
+
     return Response({
         'refresh': str(refresh),
         'access': str(refresh.access_token),
