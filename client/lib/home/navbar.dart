@@ -27,7 +27,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
           child: Padding(
             padding: const EdgeInsets.only(right: 10),
             child: CircleAvatar(
-              radius: 22,
+              radius: 19,
               backgroundColor: Colors.transparent,
               backgroundImage: isAuthenticated
                   ? NetworkImage('https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/qspf0rk9sa4ge0ykbaoc.jpg')

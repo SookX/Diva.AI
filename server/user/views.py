@@ -162,8 +162,11 @@ def user(request, id=None):
     }, status=status.HTTP_200_OK)
 
     if request.method == 'GET' and id is None:
-        users = CustomUser.objects.values('id', 'username', 'email')
-        return Response(list(users))
+        user = request.user
+        return Response({
+            "username": user.username,
+            "email": user.email
+        }, status=status.HTTP_200_OK)
     
     if request.method == 'PUT':
         user = request.user
