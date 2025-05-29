@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/gestures.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:client/home/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -39,6 +40,9 @@ class _LoginPageState extends State<LoginPage> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('access_token', accessToken);
         await prefs.setString('refresh_token', refreshToken);
+
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        await userProvider.login(accessToken, refreshToken);
 
         print('Login successful!');
         print(response.body);
@@ -88,6 +92,10 @@ class _LoginPageState extends State<LoginPage> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('access_token', accessToken);
         await prefs.setString('refresh_token', refreshToken);
+
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        await userProvider.login(accessToken, refreshToken);
+
 
         _showNotification("Google login successful!", true);
         Future.delayed(const Duration(seconds: 2), () {
