@@ -9,7 +9,7 @@ class SurchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFF101825),
+        color: Color.fromARGB(255, 10, 2, 34),
         borderRadius: BorderRadius.circular(12),
       ),
       padding: EdgeInsets.symmetric(horizontal: 16),

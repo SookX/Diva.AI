@@ -20,7 +20,7 @@ class MovieCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Color(0xFF101825),
+      color: Color.fromARGB(255, 10, 2, 34),
       margin: EdgeInsets.all(12.w),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       elevation: 4,

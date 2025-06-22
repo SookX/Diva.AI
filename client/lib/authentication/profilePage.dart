@@ -1,9 +1,9 @@
-import 'dart:ffi';
-
+import 'dart:io';
 import 'package:client/home/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -14,6 +14,8 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool _isLoading = true;
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
 
   final List<String> types = ["type1", "type2"];
 
@@ -28,6 +30,18 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> pickImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+
+      // send to the backend
+    }
   }
 
   @override
@@ -47,22 +61,29 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 CircleAvatar(
                   radius: 65,
-                  backgroundImage: NetworkImage('https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/qspf0rk9sa4ge0ykbaoc.jpg'),
+                  backgroundImage: _selectedImage != null
+                      ? FileImage(_selectedImage!) as ImageProvider
+                      : const NetworkImage(
+                          'https://res.cloudinary.com/djm6yhqvx/image/upload/v1735230618/qspf0rk9sa4ge0ykbaoc.jpg',
+                        ),
                 ),
                 Positioned(
                   bottom: 5,
                   right: 5,
-                  child: Container(
-                    height: 30,
-                    width: 30,
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 31, 28, 71), 
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.edit,
-                      color: Colors.white,
-                      size: 18,
+                  child: GestureDetector(
+                    onTap: pickImage,
+                    child: Container(
+                      height: 30,
+                      width: 30,
+                      decoration: const BoxDecoration(
+                        color: Color.fromARGB(255, 31, 28, 71),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ),
@@ -100,14 +121,15 @@ class _ProfilePageState extends State<ProfilePage> {
                   padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
                 ),
                 onPressed: () {
+                  logout(context);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Icon(Icons.person_outline, color: Colors.white),
+                    Icon(Icons.logout, color: Colors.white),
                     SizedBox(width: 10.w),
                     Text(
-                      'Edit Profile',
+                      'Log Out',
                       style: TextStyle(fontSize: 16.sp, color: Colors.white),
                     ),
                   ],
@@ -286,7 +308,7 @@ class MyList extends StatelessWidget {
 //       appBar: AppBar(title: const Text("Profile")),
 //       body: Center(
 //         child: _isLoading
-//             ? const CircularProgressIndicator(color: Colors.white)
+//             ? const CircularProgressIndicator(color: Colors.white)x
 //             : Column(
 //                 mainAxisAlignment: MainAxisAlignment.center,
 //                 children: [
