@@ -16,6 +16,11 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isLoading = true;
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
+  bool isEditingUsername = false;
+  bool isEditingEmail = false;
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   final List<String> types = ["type1", "type2"];
 
@@ -92,19 +97,80 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
 
           Center(
-            child: Text(
-              "${userProvider.username ?? 'N/A'}",
-              style: const TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
-            ),
+            child: isEditingUsername
+                ? SizedBox(
+                    width: 250.w,
+                    child: TextField(
+                      controller: _usernameController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        hintText: 'Enter username',
+                        hintStyle: TextStyle(color: Colors.white54),
+                        border: UnderlineInputBorder(),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white54),
+                        ),
+                      ),
+                      onSubmitted: (value) {
+                        setState(() {
+                          isEditingUsername = false;
+                          // send new username to backend here
+                        });
+                      },
+                    ),
+                  )
+                : GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isEditingUsername = true;
+                        _usernameController.text = userProvider.username ?? '';
+                      });
+                    },
+                    child: Text(
+                      userProvider.username ?? 'N/A',
+                      style: const TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                  ),
           ),
 
           
           Center(
-            child: Text(
-              "${userProvider.email ?? 'N/A'}",
-              style: const TextStyle(color: Colors.white70, fontSize: 18),
-            ),
+            child: isEditingEmail
+                ? SizedBox(
+                    width: 250.w,
+                    child: TextField(
+                      controller: _emailController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        hintText: 'Enter email',
+                        hintStyle: TextStyle(color: Colors.white54),
+                        border: UnderlineInputBorder(),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white54),
+                        ),
+                      ),
+                      onSubmitted: (value) {
+                        setState(() {
+                          isEditingEmail = false;
+                          // send new email to backend here
+                        });
+                      },
+                    ),
+                  )
+                : GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isEditingEmail = true;
+                        _emailController.text = userProvider.email ?? '';
+                      });
+                    },
+                    child: Text(
+                      userProvider.email ?? 'N/A',
+                      style: const TextStyle(color: Colors.white70, fontSize: 18),
+                    ),
+                  ),
           ),
+
 
           SizedBox(height: 30.h),
 
