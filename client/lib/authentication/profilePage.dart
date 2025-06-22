@@ -133,42 +133,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
           ),
 
-          
           Center(
-            child: isEditingEmail
-                ? SizedBox(
-                    width: 250.w,
-                    child: TextField(
-                      controller: _emailController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        hintText: 'Enter email',
-                        hintStyle: TextStyle(color: Colors.white54),
-                        border: UnderlineInputBorder(),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white54),
-                        ),
-                      ),
-                      onSubmitted: (value) {
-                        setState(() {
-                          isEditingEmail = false;
-                          // send new email to backend here
-                        });
-                      },
-                    ),
-                  )
-                : GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isEditingEmail = true;
-                        _emailController.text = userProvider.email ?? '';
-                      });
-                    },
-                    child: Text(
-                      userProvider.email ?? 'N/A',
-                      style: const TextStyle(color: Colors.white70, fontSize: 18),
-                    ),
-                  ),
+            child: Text(
+                "${userProvider.email ?? 'N/A'}",
+                style: const TextStyle(color: Colors.white70, fontSize: 18),
+              ),
           ),
 
 
