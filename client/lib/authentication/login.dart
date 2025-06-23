@@ -203,14 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                 logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/2048px-Google_%22G%22_logo.svg.png",
                 onPressed: _loginWithGoogle,
               ),
-              SizedBox(height: 16.h),
-              _socialButton(
-                label: "Continue with Facebook",
-                logoUrl: "https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_(2019).png",
-                onPressed: () {
-      
-                },
-              ),
+              
 
               SizedBox(height: 40.h,),
 

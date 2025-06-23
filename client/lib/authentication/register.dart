@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:another_flushbar/flushbar.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:client/home/user_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -44,6 +48,55 @@ class _RegisterViewState extends State<RegisterView> {
       _showNotification("$e", false);
     }
   }
+
+  Future<void> _loginWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        _showNotification("Google sign-in cancelled.", false);
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        _showNotification("Failed to retrieve Google ID token.", false);
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:8000/api/user/google-login/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'token': idToken}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        final accessToken = data['access'];
+        final refreshToken = data['refresh'];
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('access_token', accessToken);
+        await prefs.setString('refresh_token', refreshToken);
+
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        await userProvider.login(accessToken, refreshToken);
+
+
+        _showNotification("Google login successful!", true);
+        Future.delayed(const Duration(seconds: 2), () {
+          Navigator.pushNamed(context, '/');
+        });
+      } else {
+        _showNotification("Backend login failed. ${response.statusCode}", false);
+      }
+    } catch (e) {
+      print("Google login error: $e");
+      _showNotification("Google login error: $e", false);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -133,15 +186,11 @@ class _RegisterViewState extends State<RegisterView> {
                 label: "Continue with Google",
                 logoUrl:
                     "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/2048px-Google_%22G%22_logo.svg.png",
-                onPressed: () {},
+                onPressed: () {
+                  _loginWithGoogle();
+                },
               ),
-              SizedBox(height: 16.h),
-              _socialButton(
-                label: "Continue with Facebook",
-                logoUrl:
-                    "https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_(2019).png",
-                onPressed: () {},
-              ),
+              
               SizedBox(height: 40.h),
               RichText(
                 text: TextSpan(
