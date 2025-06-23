@@ -170,25 +170,26 @@ def user(request, id=None):
     
     if request.method == 'PUT':
         user = request.user
-        old_password = request.data.get('old_password')
-        new_password = request.data.get('new_password')
+        
+        old_password = request.data.get("old_password")
+        new_password = request.data.get("new_password")
 
-        if not old_password or not new_password:
-            return Response(
-                {"error": "Both old_password and new_password are required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        if new_password:
+            user.set_password(new_password)
+            user.save()
 
-        if not user.check_password(old_password):
-            return Response(
-                {"error": "Old password is incorrect"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({"message": "Password has been changed successfully"}, status=status.HTTP_200_OK)
 
-        user.set_password(new_password)
-        user.save()
+        else:
+            new_username = request.data.get("new_username")
 
-        return Response({"message": "Password has been changed successfully"}, status=status.HTTP_200_OK)
+            if user.username == new_username:
+                return Response(status=status.HTTP_200_OK)
+
+            user.username = new_username
+            user.save()
+
+            return Response({"message": f"Username has been changed successfully to: {new_username}"}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def activate_user(request, uidb64, token):

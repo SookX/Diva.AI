@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -17,10 +20,8 @@ class _ProfilePageState extends State<ProfilePage> {
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
   bool isEditingUsername = false;
-  bool isEditingEmail = false;
 
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
 
   final List<String> types = ["type1", "type2"];
 
@@ -48,6 +49,36 @@ class _ProfilePageState extends State<ProfilePage> {
       // send to the backend
     }
   }
+
+  Future<void> changeName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token');
+
+    if (token == null) return;
+
+    final newUsername = _usernameController.text.trim();
+
+    if (newUsername.isEmpty) return;
+
+    final url = Uri.parse('http://10.0.2.2:8000/api/user/');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'new_username': newUsername}),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      Provider.of<UserProvider>(context, listen: false).fetchUserProfile();
+    } else {
+      print("Failed to update username: ${response.body}");
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +145,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       onSubmitted: (value) {
                         setState(() {
                           isEditingUsername = false;
-                          // send new username to backend here
+                          changeName();
                         });
                       },
                     ),
