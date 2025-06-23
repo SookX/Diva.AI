@@ -175,10 +175,13 @@ def user(request, id=None):
         new_password = request.data.get("new_password")
 
         if new_password:
-            user.set_password(new_password)
-            user.save()
+            if  user.check_password(old_password):
+                user.set_password(new_password)
+                user.save()
 
-            return Response({"message": "Password has been changed successfully"}, status=status.HTTP_200_OK)
+                return Response({"message": "Password has been changed successfully"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "Old password doesn't match"}, status=status.HTTP_400_BAD_REQUEST)
 
         else:
             new_username = request.data.get("new_username")

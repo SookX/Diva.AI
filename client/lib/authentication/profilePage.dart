@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/gestures.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -20,7 +22,10 @@ class _ProfilePageState extends State<ProfilePage> {
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
   bool isEditingUsername = false;
+  bool isChangingPassword = false;
 
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController(); 
   final TextEditingController _usernameController = TextEditingController();
 
   final List<String> types = ["type1", "type2"];
@@ -78,6 +83,42 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> changePassword() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token');
+
+    if (token == null) return;
+
+    final oldPassword = _oldPasswordController.text.trim();
+    final newPassword = _newPasswordController.text.trim();
+
+    if (oldPassword.isEmpty || newPassword.isEmpty) return;
+
+    final url = Uri.parse('http://10.0.2.2:8000/api/user/');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'old_password': oldPassword,
+        'new_password': newPassword,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      _showNotification("Password changed successfully", true);
+      setState(() {
+        isChangingPassword = false;
+        _oldPasswordController.clear();
+        _newPasswordController.clear();
+      });
+    } else {
+      _showNotification("Failed to change password", false);
+    }
+  }
 
 
   @override
@@ -86,7 +127,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 10, 8, 27),
-      body: Column(
+      body: SingleChildScrollView(
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
@@ -205,36 +247,126 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
 
 
-          SizedBox(height: 10.h),
+          SizedBox(height: 10.h,),
 
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 24, 21, 53),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
-                ),
-                onPressed: () {
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start, 
-                  children: [
-                    Icon(Icons.lock_outline, color: Colors.white),
-                    SizedBox(width: 10.w),
-                    Text(
-                      'Change Password',
-                      style: TextStyle(fontSize: 16.sp, color: Colors.white),
+            child: AnimatedSwitcher(
+              duration: Duration(milliseconds: 700),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                final offsetAnimation = Tween<Offset>(
+                  begin: const Offset(0.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation);
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(position: offsetAnimation, child: child),
+                );
+              },
+              child: isChangingPassword
+                  ? Column(
+                      key: ValueKey('changePasswordForm'),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: _oldPasswordController,
+                          obscureText: true,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            labelText: 'Old Password',
+                            labelStyle: TextStyle(color: Colors.white70),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white54),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                        TextField(
+                          controller: _newPasswordController,
+                          obscureText: true,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            labelText: 'New Password',
+                            labelStyle: TextStyle(color: Colors.white70),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white54),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                        Row(
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color.fromARGB(255, 24, 21, 53),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+                              ),
+                              onPressed: changePassword,
+                              child: Text(
+                                'Save',
+                                style: TextStyle(fontSize: 16.sp, color: Colors.white),
+                              ),
+                            ),
+                            SizedBox(width: 20.w),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  isChangingPassword = false;
+                                  _oldPasswordController.clear();
+                                  _newPasswordController.clear();
+                                });
+                              },
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(fontSize: 14.sp, color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    )
+                  : SizedBox(
+                      key: ValueKey('changePasswordButton'),
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 24, 21, 53),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isChangingPassword = true;
+                          });
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.lock_outline, color: Colors.white),
+                            SizedBox(width: 10.w),
+                            Text(
+                              'Change Password',
+                              style: TextStyle(fontSize: 16.sp, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-              ),
             ),
           ),
+
 
           SizedBox(height: 30.h,),
 
@@ -277,9 +409,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
           SizedBox(height: 40,),
 
-          MyList()
 
-        ],
+          MyList(),
+          ],
+
+      ),
       ),
     );
   }
@@ -287,6 +421,28 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> logout(BuildContext context) async {
     await Provider.of<UserProvider>(context, listen: false).logout();
     Navigator.of(context).pushReplacementNamed('/login');
+  }
+
+  void _showNotification(String message, bool success) {
+    Flushbar(
+      message: message,
+      icon: Icon(
+        success ? Icons.check_circle : Icons.error,
+        size: 28.0,
+        color: success ? Colors.green : Colors.red,
+      ),
+      duration: Duration(seconds: 2),
+      leftBarIndicatorColor: success ? Colors.green : Colors.red,
+      margin: EdgeInsets.all(12),
+      borderRadius: BorderRadius.circular(8),
+      backgroundGradient: LinearGradient(
+        colors: success
+            ? [Colors.green.shade700, Colors.greenAccent]
+            : [Colors.red.shade700, Colors.redAccent],
+      ),
+      flushbarPosition: FlushbarPosition.TOP,
+      animationDuration: Duration(milliseconds: 500),
+    ).show(context);
   }
 }
 
@@ -368,36 +524,3 @@ class MyList extends StatelessWidget {
   }
 
 }
-
-// return Scaffold(
-//       backgroundColor: const Color(0xFF030016),
-//       appBar: AppBar(title: const Text("Profile")),
-//       body: Center(
-//         child: _isLoading
-//             ? const CircularProgressIndicator(color: Colors.white)x
-//             : Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   IconButton(
-//                     icon: const Icon(Icons.logout),
-//                     onPressed: () => logout(context),
-//                   ),
-//                   const SizedBox(height: 40),
-//                   const Text(
-//                     "User Profile",
-//                     style: TextStyle(color: Colors.white, fontSize: 24),
-//                   ),
-//                   const SizedBox(height: 20),
-                  // Text(
-                  //   "Username: ${userProvider.username ?? 'N/A'}",
-                  //   style: const TextStyle(color: Colors.white, fontSize: 18),
-                  // ),
-                  // const SizedBox(height: 10),
-                  // Text(
-                  //   "Email: ${userProvider.email ?? 'N/A'}",
-                  //   style: const TextStyle(color: Colors.white, fontSize: 18),
-                  // ),
-//                 ],
-//               ),
-//       ),
-//     );
